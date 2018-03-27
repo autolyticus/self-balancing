@@ -62,7 +62,7 @@ class StepperMotor:
             self.pi.write(self.enable, 1)
 
         self.stepAngle = 1.8
-        self.smallDelay = 0.006
+        self.smallDelay = 0.001
         self.currentStep = 0
 
     def setStep(self, nextStep):
@@ -91,7 +91,7 @@ class StepperMotor:
         if angle > 0:
             self.stepForward(steps=numSteps, delay=delay)
         elif angle < 0:
-            self.stepBackward(steps=numSteps, delay=delay)
+            self.stepBackward(steps=-numSteps, delay=delay)
         else:
             self.stop()
 
@@ -107,3 +107,10 @@ def Motor(**kwargs):
     elif kwargs.get('type') == 'dc':
         kwargs.pop('type', None)
         return DCMotor(**kwargs)
+
+
+if __name__ == '__main__':
+    import pdb
+    pdb.set_trace()
+    m1.angleMovement(30)
+    m1.angleMovement(-30)

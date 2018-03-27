@@ -7,7 +7,12 @@ import math
 from pidcontroller import PIDController
 import  RPi.GPIO as GPIO
 
+import pigpio
+from motor import Motor 
 
+thisPi = pigpio.pi()
+m1 = Motor(pi=thisPi, type='stepper', pins=(37, 36, 38, 40))
+m2 = Motor(pi=thisPi, type='stepper', pins=(35, 33, 31, 32))
 
 #GPIO.setmode(GPIO.BCM) #Setting the Mode to use. I am using the BCM setup
 #GPIO.setwarnings(False) 
@@ -34,11 +39,16 @@ import  RPi.GPIO as GPIO
 #PWM2.start(0)
 #PWM3.start(0)
 #PWM4.start(0)
-
+def map(x, in_min, in_max, out_min, out_max):
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 
 ##This backward function takes a velocity argument that is the PID value. Both motors drives backward
 def backward(velocity):
-    return
+    velocity = -velocity
+    vel = map(velocity, 0, 4000, 60, 200)
+    vel = -vel
+    m1.rotate(-vel)
+    m2.rotate(-vel)
     # PWM1.ChangeDutyCycle(velocity)
     # GPIO.output(int2, GPIO.LOW)
     # PWM3.ChangeDutyCycle(velocity)
@@ -46,7 +56,9 @@ def backward(velocity):
 
 ##Alike the backward funtion this forward function does the same thing but moves both the motors forward.
 def forward(velocity):
-    return
+    vel = map(velocity, 0, 4000, 60, 200)
+    m1.rotate(vel)
+    m2.rotate(vel)
     # GPIO.output(int1, GPIO.LOW)
     # PWM2.ChangeDutyCycle(velocity)
     # GPIO.output(int3, GPIO.LOW)
@@ -54,11 +66,8 @@ def forward(velocity):
 
 ##If the PID value is 0 (the Robot is 'balanced') it uses this equilibrium function.
 def equilibrium():
-    return
-    GPIO.output(int1, False)
-    GPIO.output(int2, False)
-    GPIO.output(int3, False)
-    GPIO.output(int4, False)
+    m1.rotate(0)
+    m2.rotate(0)
 
 
 sensor = mpu6050(0x68)
@@ -130,26 +139,27 @@ while True:
     rotation_y = y_rotation(accelX, accelY, accelZ)
     
     #Complementary Filter
-    last_x = K * (last_x + gyro_x_delta) + (K1 * rotation_x)
+    # last_x = K * (last_x + gyro_x_delta) + (K1 * rotation_x)
     last_y = K * (last_y + gyro_y_delta) + (K1 * rotation_y)
+    # last_y = last_y - 15
 
     #setting the PID values. Here you can change the P, I and D values according to yiur needs
-    PID = PIDController(P=-78.5, I=1.0, D=1.0)
-    PIDx = PID.step(last_x)
+    PID = PIDController(P=50, I=0.0, D=0.0)
+    # PIDx = PID.step(last_x)
+    PIDy = PID.step(last_y)
 
     #if the PIDx data is lower than 0.0 than move appropriately backward
-    if PIDx < 0.0:
-        backward(-float(PIDx))
+    if PIDy < 0.0:
+        backward(float(PIDy))
         #StepperFor(-PIDx)
     #if the PIDx data is higher than 0.0 than move appropriately forward
-    elif PIDx > 0.0:
-        forward(float(PIDx))
+    elif PIDy > 0.0:
+        forward(float(PIDy))
         #StepperBACK(PIDx)
     #if none of the above statements is fulfilled than do not move at all 
     else:
         equilibrium()
 
-
     # print(last_x, 'PID: ', int(PIDx))
-    print(last_y, 'PID: ', int(PIDx))
-    sleep(0.02)
+    print(last_y, 'PID: ', int(PIDy))
+    #sleep(0.02)

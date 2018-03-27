@@ -4,7 +4,6 @@ import pigpio
 import time
 
 from phy import phytogpio
-from motor import motor
 
 try:
     shm = open('/dev/shm/MPU', 'r')

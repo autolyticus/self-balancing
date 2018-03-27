@@ -3,16 +3,16 @@
 #include <pigpiod_if2.h>
 #include <pthread.h>
 #include <signal.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include <unistd.h>
 
 #define stepAngle 1.8
 
 int piNum = -1;
 
-const int maxrpm = 375;
+const int maxrpm = 200;
 const int minrpm = 60;
 
 const double conversionFactor = 60.0 * (stepAngle / 360.0);
@@ -28,6 +28,7 @@ void stop(int signum) {
   rpm = 0;
   /* gpioTerminate(); */
   for (int i = 0; i < 4; i++) {
+    gpio_write(piNum, pins[i], 0);
     printf("setting pin %d as input", i);
     set_mode(piNum, pins[i], PI_INPUT);
   }

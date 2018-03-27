@@ -7,7 +7,15 @@ import time
 processes = []
 
 try:
-    processes.append(s.Popen(split('./imud/imud &> /dev/null &'), shell=True))
+    if s.call('pgrep -a imud &> /dev/null', shell=True):
+        print('Starting imud')
+        s.call('./imud/imud &> /dev/null &', shell=True)
+    if s.call('pgrep -a pigpiod &> /dev/null', shell=True):
+        print('Starting pigpiod')
+        try:
+            a = s.Popen(split('pigpiod'), shell=True)
+        except FileNotFoundError:
+            print('Please install pigpio library')
     time.sleep(1)
 
 except FileNotFoundError:
@@ -15,13 +23,6 @@ except FileNotFoundError:
     exit()
 
 try:
-    if s.call('pgrep -a pigpiod &> /dev/null', shell=True):
-        print('Starting pigpiod')
-        try:
-            a = s.Popen(split('(sudo pigpiod) &'), shell=True)
-        except FileNotFoundError:
-            print('Please install pigpio library')
-
             # processes.append(
             #     s.Popen(split('python3 ./broadcaster.py &'), shell=True))
             # processes.append(
@@ -31,7 +32,8 @@ try:
         pass
 
 except:
-    pass
+    for process in processes:
+        process.terminate()
     # s.call('pkill mpud', shell=True)
     # s.call('pkill -f "broadcaster.py"', shell=True)
     # s.call('pkill -f "botcontrol.py"', shell=True)

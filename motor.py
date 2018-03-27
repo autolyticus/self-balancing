@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import pigpio
-import time
+import shlex
 import subprocess as s
 
 from phy import phytogpio
@@ -66,8 +66,10 @@ class StepperMotor:
         # self.smallDelay = 0.0007
         # self.currentStep = 0
         # self.stopped = False
+        self.process = 'nice --10 ./stepd/stepd.c.out' + ' ' +\
+            ' '.join([str(pin) for pin in pins])
         self.motorProcess = s.Popen(
-            ['./stepd/stepd.c.out', *[str(pin) for pin in pins]], stdin=s.PIPE)
+            shlex.split(self.process), stdin=s.PIPE)
 
     def rotate(self, power):
         power = int(power)

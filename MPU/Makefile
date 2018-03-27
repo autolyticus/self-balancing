@@ -16,14 +16,14 @@ CXXFLAGS = -DDMP_FIFO_RATE=9 -Wall -g -O2 `pkg-config gtkmm-3.0 --cflags --libs`
 
 $(CMN_OBJS) $(DMP_OBJS) $(RAW_OBJS) : $(HDRS)
 
-demo_raw: $(CMN_OBJS) $(RAW_OBJS)
-	$(CXX) -o $@ $^ -lm
+# demo_raw: $(CMN_OBJS) $(RAW_OBJS)
+# 	$(CXX) -o $@ $^ -lm
 
-demo_dmp: $(CMN_OBJS) $(DMP_OBJS)
-	$(CXX) -o $@ $^ -lm -lrt
+# demo_dmp: $(CMN_OBJS) $(DMP_OBJS)
+# 	$(CXX) -o $@ $^ -lm -lrt
 
-demo_3d: $(D3D_OBJS) $(CMN_OBJS)
-	$(CXX) -o $@ $^ -lm `pkg-config gtkmm-3.0 --cflags --libs`
+# demo_3d: $(D3D_OBJS) $(CMN_OBJS)
+# 	$(CXX) -o $@ $^ -lm `pkg-config gtkmm-3.0 --cflags --libs`
 
 mpud: $(CMN_OBJS) $(MPUD_OBJS)
 	$(CXX) -o $@ $^ -lm -lrt

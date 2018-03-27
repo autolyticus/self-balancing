@@ -116,7 +116,7 @@ int main() {
 	shm_init();
 	signal(SIGINT, sigint_handler);
     setup();
-    usleep(100000);
+    usleep(150000);
     for (;;)
         loop();
 

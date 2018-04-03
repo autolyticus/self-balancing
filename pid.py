@@ -23,19 +23,19 @@ def getMPUVals():
     return float(a),float(b),float(c)
 
 m1 = motor(pi, 22, 13, 15)
-# m2 = motor(24, 18, 16)
+m2 = motor(pi, 24, 18, 16)
 
 try:
     while True:
         a,b,c = getMPUVals()
         print(f'{a} {b} {c}')
-        # import pdb; pdb.set_trace()
-        m1.rotate(b/90 * 255)
-        # m2.rotate(b/180 * 255)
-        time.sleep(0.1)
+        m1.rotate(255)
+        m2.rotate(255)
+        time.sleep(0.01)
 except:
     pass
 
 finally:
     m1.rotate(0)
+    m2.rotate(0)
     pass

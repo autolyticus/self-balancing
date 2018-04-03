@@ -22,20 +22,15 @@ def getMPUVals():
     a,b,c = output.split()
     return float(a),float(b),float(c)
 
-m1 = motor(pi, 22, 13, 15)
-m2 = motor(pi, 24, 18, 16)
-
+sumb = 0
 try:
-    while True:
+    for i in range(1000):
         a,b,c = getMPUVals()
-        print(f'{a} {b} {c}')
-        m1.rotate(255)
-        m2.rotate(255)
-        time.sleep(0.01)
+        sumb += b
+    print(sumb/1000)
+
 except:
     pass
 
 finally:
-    m1.rotate(0)
-    m2.rotate(0)
     pass

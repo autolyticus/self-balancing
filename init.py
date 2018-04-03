@@ -14,16 +14,16 @@ except:
 try:
     if subprocess.call('pgrep -a pigpiod &> /dev/null', shell=True):
         subprocess.call('sudo pigpiod', shell=True)
-    subprocess.call('python3 ./broadcaster.py &', shell=True)
-    subprocess.call('python3 ./botcontrol.py &', shell=True)
-    subprocess.call('python3 ./pid.py', shell=True)
+    #subprocess.call('python3 ./broadcaster.py &', shell=True)
+    #subprocess.call('python3 ./botcontrol.py &', shell=True)
+    subprocess.call('python3 ./selfbalancing.py', shell=True)
     while True:
         pass
 
 except:
     subprocess.call('pkill mpud', shell=True)
-    subprocess.call('pkill -f "broadcaster.py"', shell=True)
-    subprocess.call('pkill -f "botcontrol.py"', shell=True)
+    #subprocess.call('pkill -f "broadcaster.py"', shell=True)
+    #subprocess.call('pkill -f "botcontrol.py"', shell=True)
     subprocess.call('pkill -f "pid.py"', shell=True)
 
 finally:

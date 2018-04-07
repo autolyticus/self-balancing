@@ -18,7 +18,7 @@ class motor():
 	pin4=0
 	conv360 = 540	#need to find proper value
 
-    def __init__(self, pi, enable, cw, ccw):
+    def __init__(self, pi, enable, cw, ccw, pin1, pin2, pin3, pin4):
         self.pi = pi
         self.physenable, self.physcw, self.physccw = enable, cw, ccw
         self.enable, self.cw, self.ccw = phytogpio[enable], phytogpio[cw], phytogpio[ccw]

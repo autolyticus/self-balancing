@@ -6,7 +6,7 @@ import pigpio
 from phy import phytogpio
 
 
-class motor:
+class stepper:
 
     pi = None
     enable = 0
@@ -67,26 +67,6 @@ class motor:
                 self.stepForward(timeDiff, numSteps)
             else:
                 self.stepBackward(timeDiff, numSteps)
-
-    def rotate(self, power):
-        if power == 0:
-            self.pi.write(self.ccw, 0)
-            self.pi.write(self.cw, 0)
-        elif power > 0:
-            if power > 255:
-                power = 255
-            if power < 70:
-                power = 70
-            self.pi.set_PWM_dutycycle(self.ccw, 0)
-            self.pi.set_PWM_dutycycle(self.cw, int(power))
-        else:
-            if power < -255:
-                power = -255
-            if power > -70:
-                power = -70
-            else:
-                self.pi.set_PWM_dutycycle(self.cw, 0)
-                self.pi.set_PWM_dutycycle(self.ccw, int(-power))
 
     def stop(self):
         self.rotate(0)

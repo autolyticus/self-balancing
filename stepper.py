@@ -70,4 +70,4 @@ class stepper:
                 self.stepBackward(timeDiff, numSteps)
 
     def stop(self):
-        self.rotate(0)
+        self.setStep(0, 0, 0, 0)

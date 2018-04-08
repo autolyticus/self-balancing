@@ -61,11 +61,12 @@ class stepper:
             self.pi.write(self.pin3, v3)
             self.pi.write(self.pin4, v4)
 
-        def angleMovement(self, angle, polarity, timeDiff):
+        def angleMovement(self, angle, timeDiff):
             numSteps = conv360 / 360 * angle
-            if polarity == 1:
+            if angle > 0:
                 self.stepForward(timeDiff, numSteps)
             else:
+                numSteps = -1 * numSteps
                 self.stepBackward(timeDiff, numSteps)
 
     def stop(self):

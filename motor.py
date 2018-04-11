@@ -62,8 +62,9 @@ class StepperMotor:
             self.pi.write(self.enable, 1)
 
         self.stepAngle = 1.8
-        self.smallDelay = 0.001
+        self.smallDelay = 0.0007
         self.currentStep = 0
+        self.stopped = False
 
     def setStep(self, nextStep):
         self.pi.write(self.pin0, StepperMotor.stepSignal[nextStep][0])
@@ -110,7 +111,4 @@ def Motor(**kwargs):
 
 
 if __name__ == '__main__':
-    import pdb
-    pdb.set_trace()
-    m1.angleMovement(30)
-    m1.angleMovement(-30)
+    pass

@@ -44,6 +44,8 @@ class DCMotor:
 
 
 class StepperMotor:
+    stepSignal = ((1, 0, 1, 0), (0, 1, 1, 0), (0, 1, 0, 1), (1, 0, 0, 1))
+
     def __init__(self, pi=None, enable=0, pins=(0, 0, 0, 0)):
         self.pi = pi
         self.enable = phytogpio[enable]
@@ -58,10 +60,15 @@ class StepperMotor:
         if enable != 0:
             self.pi.set_mode(self.enable, pigpio.OUTPUT)
             self.pi.write(self.enable, 1)
-        self.stepAngle = 1.8
 
-    def stepForward4(self, delay, steps):
-        for i in range(0, steps):
+        self.stepAngle = 1.8
+        self.smallDelay = 0.006
+        self.currentStep = 0
+
+    def stepForward4(self, number, delay=0):
+        if delay == 0:
+            delay = self.smallDelay
+        for i in range(0, number):
             self.setStep(1, 0, 1, 0)
             time.sleep(delay)
             self.setStep(0, 1, 1, 0)
@@ -82,25 +89,26 @@ class StepperMotor:
             self.setStep(1, 0, 1, 0)
             time.sleep(delay)
 
-    def setStep(self, v1, v2, v3, v4):
-        self.pi.write(self.pin1, v1)
-        self.pi.write(self.pin2, v2)
-        self.pi.write(self.pin3, v3)
-        self.pi.write(self.pin4, v4)
+    def setStep(self, stepSet):
+        self.pi.write(self.pin1, StepperMotor.steps[stepSet])
+        self.pi.write(self.pin2, StepperMotor.steps[stepSet])
+        self.pi.write(self.pin3, StepperMotor.steps[stepSet])
+        self.pi.write(self.pin4, StepperMotor.steps[stepSet])
 
     def angleMovement(self, angle, timeDiff):
-        # 4 as it is a bipolar motor
-        numSteps = int(angle / (self.stepAngle * 4))
+        numSteps = int(angle / (self.stepAngle))
         if angle > 0:
             self.stepForward(timeDiff, numSteps)
         elif angle < 0:
-            numSteps = -1 * numSteps
-            self.stepBackward(timeDiff, numSteps)
+            self.stepBackward(timeDiff, -numSteps)
         else:
             self.stop()
 
     def stop(self):
-        self.setStep(0, 0, 0, 0)
+        self.pi.write(self.pin1, 0)
+        self.pi.write(self.pin2, 0)
+        self.pi.write(self.pin3, 0)
+        self.pi.write(self.pin4, 0)
 
 
 def Motor(**kwargs):

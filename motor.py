@@ -60,7 +60,7 @@ class StepperMotor:
             self.pi.write(self.enable, 1)
         self.stepAngle = 1.8
 
-    def stepForward(self, delay, steps):
+    def stepForward4(self, delay, steps):
         for i in range(0, steps):
             self.setStep(1, 0, 1, 0)
             time.sleep(delay)
@@ -71,7 +71,7 @@ class StepperMotor:
             self.setStep(1, 0, 0, 1)
             time.sleep(delay)
 
-    def stepBackward(self, delay, steps):
+    def stepBackward4(self, delay, steps):
         for i in range(0, steps):
             self.setStep(1, 0, 0, 1)
             time.sleep(delay)

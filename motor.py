@@ -49,13 +49,13 @@ class StepperMotor:
     def __init__(self, pi=None, enable=0, pins=(0, 0, 0, 0)):
         self.pi = pi
         self.enable = phytogpio[enable]
-        (self.pin1, self.pin2,
-         self.pin3, self.pin4) = (phytogpio[pins[0]], phytogpio[pins[1]],
+        (self.pin0, self.pin1,
+         self.pin2, self.pin3) = (phytogpio[pins[0]], phytogpio[pins[1]],
                                   phytogpio[pins[2]], phytogpio[pins[3]])
+        self.pi.set_mode(self.pin0, pigpio.OUTPUT)
         self.pi.set_mode(self.pin1, pigpio.OUTPUT)
         self.pi.set_mode(self.pin2, pigpio.OUTPUT)
         self.pi.set_mode(self.pin3, pigpio.OUTPUT)
-        self.pi.set_mode(self.pin4, pigpio.OUTPUT)
 
         if enable != 0:
             self.pi.set_mode(self.enable, pigpio.OUTPUT)
@@ -65,50 +65,39 @@ class StepperMotor:
         self.smallDelay = 0.006
         self.currentStep = 0
 
-    def stepForward4(self, number, delay=0):
+    def setStep(self, nextStep):
+        self.pi.write(self.pin0, StepperMotor.stepSignal[nextStep][0])
+        self.pi.write(self.pin1, StepperMotor.stepSignal[nextStep][1])
+        self.pi.write(self.pin2, StepperMotor.stepSignal[nextStep][2])
+        self.pi.write(self.pin3, StepperMotor.stepSignal[nextStep][3])
+        self.currentStep = nextStep
+
+    def stepForward(self, steps=1, delay=0):
         if delay == 0:
             delay = self.smallDelay
-        for i in range(0, number):
-            self.setStep(1, 0, 1, 0)
-            time.sleep(delay)
-            self.setStep(0, 1, 1, 0)
-            time.sleep(delay)
-            self.setStep(0, 1, 0, 1)
-            time.sleep(delay)
-            self.setStep(1, 0, 0, 1)
+        for i in range(steps):
+            self.setStep((self.currentStep+1) % len(StepperMotor.stepSignal))
             time.sleep(delay)
 
-    def stepBackward4(self, delay, steps):
-        for i in range(0, steps):
-            self.setStep(1, 0, 0, 1)
-            time.sleep(delay)
-            self.setStep(0, 1, 0, 1)
-            time.sleep(delay)
-            self.setStep(0, 1, 1, 0)
-            time.sleep(delay)
-            self.setStep(1, 0, 1, 0)
+    def stepBackward(self, steps=1, delay=0):
+        if delay == 0:
+            delay = self.smallDelay
+        for i in range(steps):
+            self.setStep((self.currentStep-1) % len(StepperMotor.stepSignal))
             time.sleep(delay)
 
-    def setStep(self, stepSet):
-        self.pi.write(self.pin1, StepperMotor.steps[stepSet])
-        self.pi.write(self.pin2, StepperMotor.steps[stepSet])
-        self.pi.write(self.pin3, StepperMotor.steps[stepSet])
-        self.pi.write(self.pin4, StepperMotor.steps[stepSet])
-
-    def angleMovement(self, angle, timeDiff):
+    def angleMovement(self, angle=0, delay=0):
         numSteps = int(angle / (self.stepAngle))
         if angle > 0:
-            self.stepForward(timeDiff, numSteps)
+            self.stepForward(steps=numSteps, delay=delay)
         elif angle < 0:
-            self.stepBackward(timeDiff, -numSteps)
+            self.stepBackward(steps=numSteps, delay=delay)
         else:
             self.stop()
 
     def stop(self):
-        self.pi.write(self.pin1, 0)
-        self.pi.write(self.pin2, 0)
-        self.pi.write(self.pin3, 0)
-        self.pi.write(self.pin4, 0)
+        for pin in [self.pin0, self.pin1, self.pin2, self.pin3]:
+            self.pi.write(pin, 0)
 
 
 def Motor(**kwargs):

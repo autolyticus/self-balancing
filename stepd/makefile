@@ -1,4 +1,4 @@
-default: motorDaemon.c.out
+default: stepd.c.out
 	@echo "No targets specified."
 %.cpp.out: %.cpp
 	g++ -g -o $@ $<

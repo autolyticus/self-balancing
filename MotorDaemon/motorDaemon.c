@@ -1,5 +1,6 @@
+#include "phy.h"
 #include <fcntl.h>
-#include <pigpio.h>
+#include <pigpiod_if2.h>
 #include <pthread.h>
 #include <signal.h>
 #include <stdio.h>
@@ -12,6 +13,8 @@
 #include <unistd.h>
 
 #define stepAngle 1.8
+
+int piNum = -1;
 
 const int maxrpm = 375;
 const int minrpm = 60;
@@ -38,15 +41,16 @@ int main(int argc, char *argv[]) {
   if (argc != 5) {
     return -1;
   }
-  /* if (gpioInitialise() < 0) */
-  /*   return -1; */
+  if (( piNum = pigpio_start(NULL, NULL) ) < 0)
+    return -1;
+  /* printf("%d", piNum); */
   /* gpioSetSignalFunc(SIGINT, stop); */
 
   short pins[4];
   for (int i = 0; i < (argc - 1); i++) {
     printf("setting pin %d as output", i);
-    pins[i] = atoi(argv[i + 1]);
-    /* gpioSetMode(pins[i], PI_OUTPUT); */
+    pins[i] = phytogpio[atoi(argv[i + 1])];
+    set_mode(piNum, pins[i], PI_OUTPUT);
   }
 
   pthread_t inputThread;
@@ -68,17 +72,19 @@ int main(int argc, char *argv[]) {
     }
   }
   /* Stop DMA, release resources */
-  /* gpioTerminate(); */
 
   return 0;
 }
 
 void stepWrite(short pins[], unsigned short stepNumber) {
-  printf("Writing (%d, ", stepSignal[currentStep][0]);
-  printf("%d, ", stepSignal[currentStep][1]);
-  printf("%d, ", stepSignal[currentStep][2]);
-  printf("%d)", stepSignal[currentStep][3]);
-  printf("to pins (%d, %d, %d, %d)\n", pins[0], pins[1], pins[2], pins[3]);
+  /* printf("Writing (%d, ", stepSignal[currentStep][0]); */
+  /* printf("%d, ", stepSignal[currentStep][1]); */
+  /* printf("%d, ", stepSignal[currentStep][2]); */
+  /* printf("%d)", stepSignal[currentStep][3]); */
+  /* printf("to pins (%d, %d, %d, %d)\n", pins[0], pins[1], pins[2], pins[3]); */
+  for (int i=0; i<4; i++) {
+	  gpio_write(piNum, pins[i], stepSignal[currentStep][i]);
+  }
 }
 
 void *updaterpm(void *param) {

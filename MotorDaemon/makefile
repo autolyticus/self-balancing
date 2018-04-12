@@ -1,9 +1,9 @@
-default:
+default: motorDaemon.c.out
 	@echo "No targets specified."
 %.cpp.out: %.cpp
 	g++ -g -o $@ $<
 %.c.out: %.c
-	gcc -g -o $@ $< -lrt -lreadline -lpthread
+	gcc -g -o $@ $< -lrt -lreadline -lpthread -lpigpiod_if2 -g
 clean:
 	rm -rf *.out
 %.py.out: %.py

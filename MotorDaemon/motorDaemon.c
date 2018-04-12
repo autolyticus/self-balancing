@@ -32,8 +32,10 @@ void stop(int signum) {
 
 void *updaterpm(void *);
 
+void stepWrite(short pins[], unsigned short stepNumber);
+
 int main(int argc, char *argv[]) {
-  if (argc != 6) {
+  if (argc != 5) {
     return -1;
   }
   /* if (gpioInitialise() < 0) */
@@ -41,7 +43,7 @@ int main(int argc, char *argv[]) {
   /* gpioSetSignalFunc(SIGINT, stop); */
 
   short pins[4];
-  for (int i = 1; i < (argc - 1); i++) {
+  for (int i = 0; i < (argc - 1); i++) {
     printf("setting pin %d as output", i);
     pins[i] = atoi(argv[i + 1]);
     /* gpioSetMode(pins[i], PI_OUTPUT); */
@@ -52,19 +54,13 @@ int main(int argc, char *argv[]) {
 
   while (1) {
     if (rpm > 0) {
-      printf("Writing %d, ", stepSignal[currentStep][0]);
-      printf("%d, ", stepSignal[currentStep][1]);
-      printf("%d, ", stepSignal[currentStep][2]);
-      printf("%d\n", stepSignal[currentStep][3]);
+      stepWrite(pins, currentStep);
       currentStep = (currentStep + 1) % 4;
       usleep(conversionFactor / rpm);
       /* printf("%s\n", (char *)ptr); */
       /* fflush(stdout); */
     } else if (rpm < 0) {
-      printf("Writing %d, ", stepSignal[currentStep][0]);
-      printf("%d, ", stepSignal[currentStep][1]);
-      printf("%d, ", stepSignal[currentStep][2]);
-      printf("%d\n", stepSignal[currentStep][3]);
+      stepWrite(pins, currentStep);
       currentStep = (currentStep + 3) % 4;
       usleep(conversionFactor / -rpm);
       /* printf("%s\n", (char *)ptr); */
@@ -75,6 +71,14 @@ int main(int argc, char *argv[]) {
   /* gpioTerminate(); */
 
   return 0;
+}
+
+void stepWrite(short pins[], unsigned short stepNumber) {
+  printf("Writing (%d, ", stepSignal[currentStep][0]);
+  printf("%d, ", stepSignal[currentStep][1]);
+  printf("%d, ", stepSignal[currentStep][2]);
+  printf("%d)", stepSignal[currentStep][3]);
+  printf("to pins (%d, %d, %d, %d)\n", pins[0], pins[1], pins[2], pins[3]);
 }
 
 void *updaterpm(void *param) {

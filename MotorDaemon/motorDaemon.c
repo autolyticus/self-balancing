@@ -57,16 +57,17 @@ int main(int argc, char *argv[]) {
   pthread_create(&inputThread, NULL, updaterpm, NULL);
 
   while (1) {
-    if (rpm > 0) {
+	int currpm = rpm;
+    if (currpm > 0) {
       stepWrite(pins, currentStep);
       currentStep = (currentStep + 1) % 4;
-      usleep(conversionFactor / rpm);
+      usleep(conversionFactor / currpm);
       /* printf("%s\n", (char *)ptr); */
       /* fflush(stdout); */
-    } else if (rpm < 0) {
+    } else if (currpm < 0) {
       stepWrite(pins, currentStep);
       currentStep = (currentStep + 3) % 4;
-      usleep(conversionFactor / -rpm);
+      usleep(conversionFactor / -currpm);
       /* printf("%s\n", (char *)ptr); */
       /* fflush(stdout); */
     }

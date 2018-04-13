@@ -1,33 +1,46 @@
 #!/usr/bin/env python3
 
-import subprocess
+import subprocess as s
+from shlex import split
 import time
 
+processes = []
+
 try:
-    subprocess.call('./MPU/mpud &> /dev/null &', shell=True)
+    processes.append(s.Popen(split('./imud/imud &> /dev/null &'), shell=True))
     time.sleep(1)
 
-except:
-    print("MPUD doesn't seem to be compiled???")
+except FileNotFoundError:
+    print('MPUD doesnt seem to be compiled')
     exit()
 
 try:
-    if subprocess.call('pgrep -a pigpiod &> /dev/null', shell=True):
-        subprocess.call('sudo pigpiod', shell=True)
-    #subprocess.call('python3 ./broadcaster.py &', shell=True)
-    #subprocess.call('python3 ./botcontrol.py &', shell=True)
-    subprocess.call('python3 ./selfbalancing.py', shell=True)
+    if s.call('pgrep -a pigpiod &> /dev/null', shell=True):
+        print('Starting pigpiod')
+        try:
+            a = s.Popen(split('(sudo pigpiod) &'), shell=True)
+        except FileNotFoundError:
+            print('Please install pigpio library')
+
+            # processes.append(
+            #     s.Popen(split('python3 ./broadcaster.py &'), shell=True))
+            # processes.append(
+            #     s.Popen(split('python3 ./botcontrol.py &'), shell=True))
+    processes.append(s.call('python3 ./selfbalancing.py', shell=True))
     while True:
         pass
 
 except:
-    subprocess.call('pkill mpud', shell=True)
-    #subprocess.call('pkill -f "broadcaster.py"', shell=True)
-    #subprocess.call('pkill -f "botcontrol.py"', shell=True)
-    subprocess.call('pkill -f "pid.py"', shell=True)
+    pass
+    # s.call('pkill mpud', shell=True)
+    # s.call('pkill -f "broadcaster.py"', shell=True)
+    # s.call('pkill -f "botcontrol.py"', shell=True)
+    # s.call('pkill -f "pid.py"', shell=True)
 
 finally:
-    subprocess.call('pkill mpud', shell=True)
-    subprocess.call('pkill -f "broadcaster.py"', shell=True)
-    subprocess.call('pkill -f "botcontrol.py"', shell=True)
-    subprocess.call('pkill -f "pid.py"', shell=True)
+    for process in processes:
+        process.terminate()
+    # s.call('pkill mpud', shell=True)
+    # s.call('pkill -f "broadcaster.py"', shell=True)
+    # s.call('pkill -f "botcontrol.py"', shell=True)
+    # s.call('pkill -f "pid.py"', shell=True)

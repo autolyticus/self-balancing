@@ -1,11 +1,11 @@
 # You need to "sudo apt-get install libgtkmm-3.0-dev" to build the demo_3d binary
 
-all: mpud
+all: imud
 
 HDRS = helper_3dmath.h I2Cdev.h MPU6050_6Axis_MotionApps20.h MPU6050.h demo_3d.h
 CMN_OBJS = I2Cdev.o MPU6050.o
 DMP_OBJS = demo_dmp.o
-MPUD_OBJS = mpud.o
+IMUD_OBJS = imud.o
 RAW_OBJS = demo_raw.o
 D3D_OBJS = main_3d.o demo_3d.o
 
@@ -25,7 +25,7 @@ $(CMN_OBJS) $(DMP_OBJS) $(RAW_OBJS) : $(HDRS)
 # demo_3d: $(D3D_OBJS) $(CMN_OBJS)
 # 	$(CXX) -o $@ $^ -lm `pkg-config gtkmm-3.0 --cflags --libs`
 
-mpud: $(CMN_OBJS) $(MPUD_OBJS)
+imud: $(CMN_OBJS) $(IMUD_OBJS)
 	$(CXX) -o $@ $^ -lm -lrt
 # 'make test_3d' will give you a test_3d that is controlled via the keyboard rather
 # than by moving the MPU6050.  Use the keys x, X, y, Y, z, Z, and q to exit.

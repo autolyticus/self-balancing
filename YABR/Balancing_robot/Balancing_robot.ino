@@ -79,11 +79,11 @@ void setup(){
   Wire.write(0x03);                                                         //Set the register bits as 00000011 (Set Digital Low Pass Filter to ~43Hz)
   Wire.endTransmission();                                                   //End the transmission with the gyro 
 
-  pinMode(2, OUTPUT);                                                       //Configure digital poort 2 as output
-  pinMode(3, OUTPUT);                                                       //Configure digital poort 3 as output
-  pinMode(4, OUTPUT);                                                       //Configure digital poort 4 as output
-  pinMode(5, OUTPUT);                                                       //Configure digital poort 5 as output
-  pinMode(13, OUTPUT);                                                      //Configure digital poort 6 as output
+  pinMode(2, OUTPUT);                                                       //Configure digital port 2 as output
+  pinMode(3, OUTPUT);                                                       //Configure digital port 3 as output
+  pinMode(4, OUTPUT);                                                       //Configure digital port 4 as output
+  pinMode(5, OUTPUT);                                                       //Configure digital port 5 as output
+  pinMode(13, OUTPUT);                                                      //Configure digital port 13 as output
 
   for(receive_counter = 0; receive_counter < 500; receive_counter++){       //Create 500 loops
     if(receive_counter % 15 == 0)digitalWrite(13, !digitalRead(13));        //Change the state of the LED every 15 loops to make the LED blink fast
@@ -235,7 +235,8 @@ void loop(){
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //Motor pulse calculations
+  //Motor pulse calculations	we don't need this, exactly.
+  //we can just have here, a direct digitalwrite on the required pins, with a delayMicroseconds() call accordingly.
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //To compensate for the non-linear behaviour of the stepper motors the folowing calculations are needed to get a linear speed behaviour.
   if(pid_output_left > 0)pid_output_left = 405 - (1/(pid_output_left + 9)) * 5500;
@@ -267,7 +268,7 @@ void loop(){
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Interrupt routine  TIMER2_COMPA_vect
+//Interrupt routine  TIMER2_COMPA_vect	runs every 20 ms
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ISR(TIMER2_COMPA_vect){
   //Left motor pulse calculations
@@ -276,7 +277,8 @@ ISR(TIMER2_COMPA_vect){
     throttle_counter_left_motor = 0;                                        //Reset the throttle_counter_left_motor variable
     throttle_left_motor_memory = throttle_left_motor;                       //Load the next throttle_left_motor variable
     if(throttle_left_motor_memory < 0){                                     //If the throttle_left_motor_memory is negative
-      PORTD &= 0b11110111;                                                  //Set output 3 low to reverse the direction of the stepper controller
+      PORTD &= 0b11110111;                                                  //Set output 3 low to reverse the direction of the stepper controller	
+	  //this is what causes movement
       throttle_left_motor_memory *= -1;                                     //Invert the throttle_left_motor_memory variable
     }
     else PORTD |= 0b00001000;                                               //Set output 3 high for a forward direction of the stepper motor
